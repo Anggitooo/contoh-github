@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Tabungan Kelompok</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f8bbd0;
+      text-align: center;
+      padding: 30px;
+      color: #6a1b9a;
+    }
+    input, button, a {
+      padding: 10px;
+      margin: 10px;
+      border-radius: 8px;
+      border: 1px solid #ab47bc;
+    }
+    button {
+      background-color: #ab47bc;
+      color: white;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #8e24aa;
+    }
+    a {
+      display: inline-block;
+      text-decoration: none;
+      background-color: #ab47bc;
+      color: white;
+      border: none;
+    }
+    a:hover {
+      background-color: #8e24aa;
+    }
+    table {
+      margin: 20px auto;
+      border-collapse: collapse;
+      width: 80%;
+      background-color: #f3e5f5;
+    }
+    th, td {
+      padding: 12px;
+      border: 1px solid #ba68c8;
+    }
+    #totalSaldo {
+      font-weight: bold;
+      margin-top: 20px;
+      color: #711d92;
+    }
+  </style>
+</head>
+<body>
+  <h2>Nabungin Kelompok 👪</h2>
+  <input type="text" id="anggota" placeholder="Nama Anggota">
+  <input type="number" id="tabung" placeholder="Jumlah Tabungan">
+  <input type="number" id="keluar" placeholder="Jumlah Pengeluaran">
+  <button onclick="tambahData()">Tambah</button>
+  <button onclick="resetData()">Reset</button>
+
+  <table id="tabelData">
+    <thead>
+      <tr>
+        <th>Nama</th>
+        <th>Tabungan</th>
+        <th>Pengeluaran</th>
+        <th>Saldo</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <div id="totalSaldo">Total Saldo Akhir: Rp0</div>
+
+  <br>
+  <a href="index.html">⬅️ Kembali ke Dashboard</a>
+
+  <script>
+    let totalSaldo = 0;
+    let dataKelompok = [];
+
+    // Muat data dari localStorage saat pertama kali halaman dibuka
+    window.onload = function() {
+      const savedData = localStorage.getItem("tabunganKelompok");
+      if (savedData) {
+        dataKelompok = JSON.parse(savedData);
+        dataKelompok.forEach(item => tampilkanData(item));
+      }
+    }
+
+    function tambahData() {
+      const nama = document.getElementById("anggota").value;
+      const tabung = parseFloat(document.getElementById("tabung").value);
+      const keluar = parseFloat(document.getElementById("keluar").value);
+      const saldo = tabung - keluar;
+
+      if (!nama || isNaN(tabung) || isNaN(keluar)) {
+        alert("Mohon isi semua data dengan benar!");
+        return;
+      }
+
+      const item = { nama, tabung, keluar, saldo };
+      dataKelompok.push(item);
+      localStorage.setItem("tabunganKelompok", JSON.stringify(dataKelompok));
+      
+      tampilkanData(item);
+
+      // Reset input
+      document.getElementById("anggota").value = "";
+      document.getElementById("tabung").value = "";
+      document.getElementById("keluar").value = "";
+    }
+
+    function tampilkanData(item) {
+      const tabel = document.getElementById("tabelData").getElementsByTagName('tbody')[0];
+      const row = tabel.insertRow();
+      row.innerHTML = `<td>${item.nama}</td><td>Rp${item.tabung}</td><td>Rp${item.keluar}</td><td>Rp${item.saldo}</td>`;
+      totalSaldo += item.saldo;
+      document.getElementById("totalSaldo").innerText = `Total Saldo Akhir: Rp${totalSaldo}`;
+    }
+
+    function resetData() {
+      if (confirm("Apakah Anda yakin ingin menghapus semua data?")) {
+        // Hapus data dari localStorage
+        localStorage.removeItem("tabunganKelompok");
+
+        // Kosongkan tabel
+        const tbody = document.getElementById("tabelData").getElementsByTagName('tbody')[0];
+        tbody.innerHTML = "";
+
+        // Reset variabel
+        dataKelompok = [];
+        totalSaldo = 0;
+        document.getElementById("totalSaldo").innerText = "Total Saldo Akhir: Rp0";
+      }
+    }
+  </script>
+</body>
+</html>

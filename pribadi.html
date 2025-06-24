@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Tabungan Pribadi</title>
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Quicksand', sans-serif;
+      background: linear-gradient(to bottom right, #fce4ec, #f8bbd0);
+      margin: 0;
+      padding: 0;
+      color: #880e4f;
+    }
+
+    .container {
+      max-width: 700px;
+      margin: auto;
+      padding: 40px 20px;
+      background: white;
+      margin-top: 50px;
+      border-radius: 16px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+      text-align: center;
+    }
+
+    h2 {
+      margin-top: 0;
+    }
+
+    .cat-img {
+      width: 80px;
+      border-radius: 50%;
+      margin-bottom: 20px;
+    }
+
+    input {
+      width: 90%;
+      padding: 10px;
+      margin: 10px 0;
+      border: 1px solid #d81b60;
+      border-radius: 10px;
+      font-size: 16px;
+    }
+
+    button {
+      background-color: #a82b55;
+      color: white;
+      border: none;
+      padding: 10px 30px;
+      font-size: 16px;
+      border-radius: 10px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    button:hover {
+      background-color: #ec407a;
+    }
+
+    table {
+      width: 100%;
+      margin-top: 30px;
+      border-collapse: collapse;
+      background-color: #fce4ec;
+    }
+
+    th, td {
+      padding: 12px;
+      border: 1px solid #d81b60;
+      text-align: center;
+    }
+
+    #saldoAkhir {
+      margin-top: 20px;
+      font-size: 18px;
+      font-weight: bold;
+      color: #6a1b9a;
+    }
+
+    a {
+      display: inline-block;
+      margin-top: 30px;
+      text-decoration: none;
+      color: white;
+      background-color: #ce93d8;
+      padding: 10px 25px;
+      border-radius: 8px;
+    }
+
+    a:hover {
+      background-color: #ba68c8;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h2>Nabungin Pribadi 👤</h2>
+
+    <input type="text" id="nama" placeholder="Nama Anda">
+    <input type="number" id="tabungan" placeholder="Jumlah Tabungan">
+    <input type="number" id="pengeluaran" placeholder="Jumlah Pengeluaran">
+    <br>
+    <button onclick="tambahData()">Tambah</button>
+    <button onclick="resetData()">Reset</button>
+
+    <div id="saldoAkhir">Saldo Akhir: Rp0</div>
+
+    <table id="tabelRiwayat">
+      <thead>
+        <tr>
+          <th>Nama</th>
+          <th>Tabungan</th>
+          <th>Pengeluaran</th>
+          <th>Saldo</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+
+    <a href="index.html">⬅️ Kembali ke Dashboard</a>
+  </div>
+
+  <script>
+    let totalSaldo = 0;
+    let dataTabungan = [];
+
+    // Load dari localStorage saat halaman dibuka
+    window.onload = function() {
+      const stored = localStorage.getItem("tabunganPribadi");
+      if (stored) {
+        dataTabungan = JSON.parse(stored);
+        dataTabungan.forEach(data => {
+          tambahBaris(data.nama, data.tabungan, data.pengeluaran, data.saldo);
+          totalSaldo += data.saldo;
+        });
+        updateSaldo();
+      }
+    };
+
+    function resetData() {
+  if (confirm("Apakah Anda yakin ingin menghapus semua data?")) {
+    // Hapus localStorage
+    localStorage.removeItem("tabunganPribadi");
+
+    // Hapus isi tabel
+    const tbody = document.getElementById("tabelRiwayat").getElementsByTagName('tbody')[0];
+    tbody.innerHTML = "";
+
+    // Reset variabel
+    dataTabungan = [];
+    totalSaldo = 0;
+    updateSaldo();
+  }
+}
+
+    function tambahData() {
+      const nama = document.getElementById("nama").value;
+      const tabungan = parseFloat(document.getElementById("tabungan").value);
+      const pengeluaran = parseFloat(document.getElementById("pengeluaran").value);
+      const saldo = tabungan - pengeluaran;
+
+      if (!nama || isNaN(tabungan) || isNaN(pengeluaran)) {
+        alert("Mohon isi semua data dengan benar!");
+        return;
+      }
+
+      const data = { nama, tabungan, pengeluaran, saldo };
+      dataTabungan.push(data);
+      localStorage.setItem("tabunganPribadi", JSON.stringify(dataTabungan));
+
+      tambahBaris(nama, tabungan, pengeluaran, saldo);
+      totalSaldo += saldo;
+      updateSaldo();
+
+      // Reset input
+      document.getElementById("nama").value = "";
+      document.getElementById("tabungan").value = "";
+      document.getElementById("pengeluaran").value = "";
+    }
+
+    function tambahBaris(nama, tabungan, pengeluaran, saldo) {
+      const tabel = document.getElementById("tabelRiwayat").getElementsByTagName('tbody')[0];
+      const row = tabel.insertRow();
+      row.innerHTML = `<td>${nama}</td><td>Rp${tabungan}</td><td>Rp${pengeluaran}</td><td>Rp${saldo}</td>`;
+    }
+
+    function updateSaldo() {
+      document.getElementById("saldoAkhir").innerText = `Saldo Akhir: Rp${totalSaldo}`;
+    }
+  </script>
+</body>
+</html>
